@@ -53,7 +53,7 @@ class AuthController {
             $result = $this->authService->register($nama_lengkap, $email, $password, $no_hp, $peran);
 
             if ($result['status']) {
-                header("Location: ../views/login.php?registration=success");
+                header("Location: login.php?registration=success");
                 exit();
             } else {
                 return $result['message'];

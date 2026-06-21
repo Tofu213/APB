@@ -3,7 +3,12 @@
 require_once __DIR__ . '/../controllers/AuthController.php';
 
 $authController = new AuthController();
-$errorMessage = $authController->handleRegister();
+
+// Mengamankan pemrosesan: Pastikan register hanya berjalan jika ada data POST yang masuk
+$errorMessage = null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $errorMessage = $authController->handleRegister();
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -24,7 +29,7 @@ $errorMessage = $authController->handleRegister();
             </div>
         <?php endif; ?>
 
-        <form action="" method="POST" class="space-y-4">
+        <form action="register.php" method="POST" class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
                 <input type="text" name="nama_lengkap" required 
