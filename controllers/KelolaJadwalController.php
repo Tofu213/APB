@@ -10,7 +10,7 @@ class KelolaJadwalController {
 
     public function __construct() {
         $database = new Database();
-        $this->db = $database->getConnection(); // Kita butuh DB untuk update tabel booking
+        $this->db = $database->getConnection();
         $this->slotRepo = new SlotRepository($this->db);
     }
 
@@ -26,7 +26,7 @@ class KelolaJadwalController {
             $tanggal = $_POST['tanggal'] ?? date('Y-m-d');
             $id_admin = $_SESSION['user_id'] ?? 0;
 
-            // AKSI 1: Buka Jadwal
+            // AKSI 1: Buka Jadwal Otomatis (Generate)
             if ($action === 'generate') {
                 $tarif = 150000;
                 for ($jam = 15; $jam <= 21; $jam++) {
@@ -38,7 +38,30 @@ class KelolaJadwalController {
                 exit();
             }
 
-            // AKSI 2: Walk-in Kasir
+            // AKSI 2: Tambah Slot Manual
+            if ($action === 'tambah_manual') {
+                $id_lapangan = intval($_POST['id_lapangan'] ?? 1);
+                $jam_mulai = $_POST['jam_mulai'] ?? '';
+                $jam_selesai = $_POST['jam_selesai'] ?? '';
+                $tarif = floatval($_POST['tarif'] ?? 0);
+
+                // Validasi sederhana
+                if ($tanggal && $jam_mulai && $jam_selesai && $tarif > 0) {
+                    $result = $this->slotRepo->createSlot($id_lapangan, $tanggal, $jam_mulai, $jam_selesai, $tarif);
+                    if ($result) {
+                        header("Location: kelola_jadwal.php?tanggal=$tanggal&status=manual_added");
+                        exit();
+                    } else {
+                        header("Location: kelola_jadwal.php?tanggal=$tanggal&status=manual_fail");
+                        exit();
+                    }
+                } else {
+                    header("Location: kelola_jadwal.php?tanggal=$tanggal&status=manual_fail");
+                    exit();
+                }
+            }
+
+            // AKSI 3: Walk-in Kasir
             if ($action === 'walk_in') {
                 $id_slot = intval($_POST['id_slot']);
 
@@ -62,14 +85,12 @@ class KelolaJadwalController {
                 exit();
             }
 
-            // AKSI 3: Batalkan Booking (Manual oleh Admin)
+            // AKSI 4: Batalkan Booking (Manual oleh Admin)
             if ($action === 'batal_manual') {
                 $id_slot = intval($_POST['id_slot']);
                 
-                // 1. Bebaskan slot agar kembali hijau di kalender
                 $this->slotRepo->releaseSlot($id_slot);
                 
-                // 2. Ubah status transaksi di tabel booking menjadi dibatalkan agar uangnya ditarik dari dashboard Owner
                 $queryBatal = "UPDATE booking SET status_booking = 'dibatalkan', updated_at = NOW() 
                                WHERE id_slot = :id_slot AND status_booking IN ('confirmed', 'menunggu_verifikasi')";
                 $stmtBatal = $this->db->prepare($queryBatal);
