@@ -9,11 +9,14 @@ class SlotRepository {
     }
 
     // Menampilkan semua slot berdasarkan tanggal tertentu (UC-02)
+    // Ganti fungsi findByTanggal yang lama dengan yang ini
     public function findByTanggal($tanggal) {
-        // Query ini juga otomatis memeriksa apakah ada status 'terkunci' yang sudah hangus (lewat 15 menit)
-        // Jika hangus, status di database dianggap 'kosong' kembali
+        // Query ini sekarang mendeteksi 2 hal:
+        // 1. Auto-Lock hangus -> kembali 'kosong'
+        // 2. Waktu main sudah lewat -> menjadi 'selesai'
         $query = "SELECT *, 
                   CASE 
+                    WHEN status_slot = 'terisi' AND TIMESTAMP(tanggal, jam_selesai) < NOW() THEN 'selesai'
                     WHEN status_slot = 'terkunci' AND lock_expired_at < NOW() THEN 'kosong'
                     ELSE status_slot 
                   END as status_riil
