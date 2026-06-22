@@ -76,15 +76,18 @@ $grafik = $dataLaporan['grafik'];
 
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
-        <div class="header-gradient rounded-2xl p-5 flex flex-wrap items-center justify-between shadow-xl mb-6 text-white">
+        <div class="bg-white p-5 rounded-2xl shadow-sm mb-6 flex flex-wrap items-center justify-between border border-gray-100">
             <div class="flex items-center gap-4">
-                <i class="fas fa-futbol text-3xl"></i>
+                <div class="bg-blue-50 p-3 rounded-xl">
+                    <i class="fas fa-chart-line text-2xl text-blue-600"></i>
+                </div>
                 <div>
-                    <h1 class="text-2xl font-extrabold tracking-tight">Dashboard Owner</h1>
-                    <p class="text-sm opacity-80">Halo, <strong><?php echo htmlspecialchars($_SESSION['nama']); ?></strong> | <i class="fas fa-crown mr-1"></i>Owner</p>
+                    <h1 class="text-2xl font-extrabold text-gray-800 tracking-tight">Panel Laporan Owner</h1>
+                    <p class="text-sm text-gray-500">Pemantauan Bisnis: <strong><?php echo htmlspecialchars($_SESSION['nama'] ?? 'Owner'); ?></strong></p>
                 </div>
             </div>
-            <a href="../logout.php" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2 backdrop-blur">
+            
+            <a href="../logout.php" class="text-red-500 hover:bg-red-50 px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 border border-transparent hover:border-red-100">
                 <i class="fas fa-sign-out-alt"></i> Keluar
             </a>
         </div>
