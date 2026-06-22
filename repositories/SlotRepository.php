@@ -59,4 +59,16 @@ class SlotRepository {
         $stmt->bindParam(":id_slot", $id_slot);
         return $stmt->execute();
     }
+    // Menambahkan slot jadwal baru ke database (UC-05)
+    public function createSlot($id_lapangan, $tanggal, $jam_mulai, $jam_selesai, $tarif) {
+        $query = "INSERT INTO slot_waktu (id_lapangan, tanggal, jam_mulai, jam_selesai, status_slot, tarif) 
+                  VALUES (:id_lapangan, :tanggal, :jam_mulai, :jam_selesai, 'kosong', :tarif)";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":id_lapangan", $id_lapangan);
+        $stmt->bindParam(":tanggal", $tanggal);
+        $stmt->bindParam(":jam_mulai", $jam_mulai);
+        $stmt->bindParam(":jam_selesai", $jam_selesai);
+        $stmt->bindParam(":tarif", $tarif);
+        return $stmt->execute();
+    }
 }

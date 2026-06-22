@@ -18,19 +18,16 @@ class BookingController {
         $this->bookingService = new BookingService($slotRepo, $bookingRepo);
     }
 
-    // Mendapatkan daftar slot jadwal berdasarkan tanggal pilihan
     public function lihatJadwal($tanggal) {
         return $this->bookingService->getJadwalPerTanggal($tanggal);
     }
 
-    // Menangani pengiriman form booking dan unggah berkas (UC-03)
     public function handleTempatkanBooking() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (session_status() == PHP_SESSION_NONE) {
                 session_start();
             }
 
-            // Pastikan pelanggan sudah masuk sesi login
             if (!isset($_SESSION['user_id'])) {
                 header("Location: login.php");
                 exit();
@@ -50,21 +47,20 @@ class BookingController {
                 $fileName = $_FILES['bukti_bayar']['name'];
                 $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
                 
-                // Ekstensi yang diizinkan sesuai alternatif alur dokumen
                 $extensions_allowed = ['jpg', 'jpeg', 'png'];
                 
                 if (in_array($fileExtension, $extensions_allowed)) {
-                    // Berikan nama unik agar berkas tidak saling tertimpa
                     $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
                     $uploadFileDir = __DIR__ . '/../uploads/bukti_bayar/';
                     
-                    // Buat folder uploads jika belum ada otomatis
                     if (!is_dir($uploadFileDir)) {
                         mkdir($uploadFileDir, 0755, true);
                     }
                     
                     $dest_path = $uploadFileDir . $newFileName;
-                    if (move_uploaded_path($fileTmpPath, $dest_path) || move_uploaded_file($fileTmpPath, $dest_path)) {
+                    
+                    // [PERBAIKAN TYPO DI SINI] Hanya menggunakan move_uploaded_file
+                    if (move_uploaded_file($fileTmpPath, $dest_path)) {
                         $foto_nama = $newFileName;
                     }
                 }
@@ -74,7 +70,6 @@ class BookingController {
                 return "Gagal mengunggah berkas bukti pembayaran. Pastikan format berupa JPG/PNG.";
             }
 
-            // Jalankan logika penempatan booking di tingkat Service
             $result = $this->bookingService->tempatkanBooking(
                 $id_user, $id_slot, $nama_tim, $no_hp, $total_bayar, $foto_nama, $metode_bayar
             );
